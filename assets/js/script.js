@@ -1,5 +1,3 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable guard-for-in */
 let tasks = {};
 
 const createTask = function (taskText, taskDate, taskList) {
@@ -48,12 +46,8 @@ const auditTask = function (taskEl) {
   // get date from task element
   const date = $(taskEl).find('span').text().trim();
 
-  console.log(date);
-
   // convert to moment object at 5:00pm
   const time = moment(date, 'L').set('hour', 17);
-
-  console.log(time);
 
   // remove any old classes from element
   $(taskEl).removeClass('list-group-item-warning list-group-item-danger');
@@ -74,16 +68,18 @@ $('.card .list-group').sortable({
   tolerance: 'pointer',
   helper: 'clone',
   activate(event, ui) {
-    console.log(ui);
+    $(this).addClass('dropover');
+    $('.bottom-trash').addClass('bottom-trash-drag');
   },
   deactivate(event, ui) {
-    console.log(ui);
+    $(this).removeClass('dropover');
+    $('.bottom-trash').removeClass('bottom-trash-drag');
   },
   over(event) {
-    console.log(event);
+    $(event.target).addClass('dropover-active');
   },
   out(event) {
-    console.log(event);
+    $(event.target).removeClass('dropover-active');
   },
   update() {
     const tempArr = [];
@@ -106,9 +102,6 @@ $('.card .list-group').sortable({
     tasks[arrName] = tempArr;
     saveTasks();
   },
-  stop(event) {
-    $(this).removeClass('dropover');
-  },
 });
 
 // trash icon can be dropped onto
@@ -118,12 +111,14 @@ $('#trash').droppable({
   drop(event, ui) {
     // remove dragged element from the dom
     ui.draggable.remove();
+    $('.bottom-trash').removeClass('bottom-trash-active');
   },
   over(event, ui) {
     console.log(ui);
+    $('.bottom-trash').addClass('bottom-trash-active');
   },
   out(event, ui) {
-    console.log(ui);
+    $('.bottom-trash').removeClass('bottom-trash-active');
   },
 });
 
@@ -146,7 +141,7 @@ $('#task-form-modal').on('shown.bs.modal', () => {
 });
 
 // save button in modal was clicked
-$('#task-form-modal .btn-primary').click(() => {
+$('#task-form-modal .btn-save').click(() => {
   // get form values
   const taskText = $('#modalTaskDescription').val();
   const taskDate = $('#modalDueDate').val();
@@ -252,3 +247,10 @@ $('#remove-tasks').on('click', () => {
 
 // load tasks for the first time
 loadTasks();
+
+// audit task due dates every 30 minutes
+setInterval(() => {
+  $('.card .list-group-item').each(function () {
+    auditTask($(this));
+  });
+}, 1800000);
