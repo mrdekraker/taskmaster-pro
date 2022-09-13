@@ -1,6 +1,5 @@
-/* eslint-disable no-console */
-/* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
+/* eslint-disable guard-for-in */
 let tasks = {};
 
 const createTask = function (taskText, taskDate, taskList) {
